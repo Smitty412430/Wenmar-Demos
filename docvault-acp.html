@@ -38,22 +38,6 @@
   .topbar-right{display:flex;align-items:center;gap:12px}
   .alert-pill{background:#fef3c7;color:#92400e;font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;border:1px solid #fcd34d}
   .user-avatar{width:32px;height:32px;border-radius:50%;background:#0f1623;color:#f59e0b;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
-  .topbar-btn{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;color:#475569;transition:all 0.15s}
-  .topbar-btn:hover{background:#e2e8f0;color:#1a1a2e}
-  .info-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px}
-  .info-modal-overlay.hidden{display:none}
-  .info-modal{background:#fff;border-radius:14px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto}
-  .info-modal-header{padding:20px 24px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between}
-  .info-modal-title{font-size:16px;font-weight:700;color:#1a1a2e}
-  .info-modal-body{padding:24px}
-  .info-section{margin-bottom:20px;padding:16px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0}
-  .info-section-title{font-size:13px;font-weight:700;color:#1a1a2e;margin-bottom:6px;display:flex;align-items:center;gap:8px}
-  .info-section-body{font-size:13px;color:#475569;line-height:1.7}
-  .info-tag{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;margin-left:6px}
-  .tag-free{background:#f0fdf4;color:#16a34a}
-  .tag-cloud{background:#eff6ff;color:#2563eb}
-  .tag-paid{background:#fef3c7;color:#92400e}
-  .tag-local{background:#f5f3ff;color:#6d28d9}
 
   .content{padding:24px;flex:1}
 
@@ -187,8 +171,6 @@
       <div class="page-title" id="pageTitle">Compliance Overview</div>
       <div class="topbar-right">
         <div class="alert-pill">⚠ 2 expiring within 60 days</div>
-        <button class="topbar-btn" onclick="openInfoModal('ai')">🤖 AI Parsing</button>
-        <button class="topbar-btn" onclick="openInfoModal('backup')">☁ Backup</button>
         <div class="user-avatar">SC</div>
       </div>
     </div>
@@ -363,18 +345,7 @@
   </div>
 </div>
 
-<!-- Info Modal -->
-<div class="info-modal-overlay hidden" id="infoModalOverlay" onclick="closeInfoIfOutside(event)">
-  <div class="info-modal">
-    <div class="info-modal-header">
-      <div class="info-modal-title" id="infoModalTitle"></div>
-      <button class="modal-close" onclick="closeInfoModal()">✕</button>
-    </div>
-    <div class="info-modal-body" id="infoModalBody"></div>
-  </div>
-</div>
-
-<!-- Doc Modal -->
+<!-- Modal -->
 <div class="modal-overlay hidden" id="modalOverlay" onclick="closeModalIfOutside(event)">
   <div class="modal" id="modal">
     <div class="modal-header">
@@ -386,65 +357,7 @@
 </div>
 
 <script>
-const infoContent = {
-  ai: {
-    title: '🤖 AI Document Parsing',
-    body: `
-      <p style="font-size:13px;color:#475569;margin-bottom:16px;line-height:1.7">DocVault uses AI to automatically read uploaded documents and extract key details — document type, issuer, issue date, and expiry date — so you don't have to type anything manually.</p>
-      <div class="info-section">
-        <div class="info-section-title">Ollama — Local AI <span class="info-tag tag-free">FREE</span><span class="info-tag tag-local">100% LOCAL</span></div>
-        <div class="info-section-body">Ollama runs an AI model directly on your own computer. Your documents never leave your machine — everything is processed locally with no internet connection required.<br><br><strong>Pros:</strong> Free, completely private, works offline, no ongoing costs.<br><strong>Cons:</strong> Requires a one-time setup, slightly slower, accuracy depends on your hardware. Best suited for businesses with a modern desktop or laptop.</div>
-      </div>
-      <div class="info-section">
-        <div class="info-section-title">Claude API — Cloud AI <span class="info-tag tag-cloud">CLOUD</span><span class="info-tag tag-paid">SMALL COST</span></div>
-        <div class="info-section-body">Claude is Anthropic's AI, accessed via the internet. DocVault sends your document text to Claude for analysis and gets back structured data instantly.<br><br><strong>Pros:</strong> Faster, more accurate, no setup required, handles complex or unusual documents very well.<br><strong>Cons:</strong> Requires an internet connection and a small per-document API cost (typically a few cents per document). Document text is sent to Anthropic's servers — Anthropic does not store or train on this data.</div>
-      </div>
-      <div class="info-section">
-        <div class="info-section-title">Which should I choose?</div>
-        <div class="info-section-body">For most small businesses, <strong>Claude API</strong> is the recommended choice — it's faster and more reliable with minimal cost. If you handle highly sensitive documents and prefer nothing leaves your network, choose <strong>Ollama</strong>. You can switch between them at any time in Settings.</div>
-      </div>
-    `
-  },
-  backup: {
-    title: '☁ Backup & Data Protection',
-    body: `
-      <p style="font-size:13px;color:#475569;margin-bottom:16px;line-height:1.7">DocVault stores all your data locally on your own machine — it never automatically uploads anything to the internet. Backup is your choice, your control.</p>
-      <div class="info-section">
-        <div class="info-section-title">Local Folder Backup <span class="info-tag tag-free">FREE</span><span class="info-tag tag-local">ON-SITE</span></div>
-        <div class="info-section-body">DocVault can automatically back up your entire vault to any folder on your computer or a connected drive — USB, external hard drive, or a mapped network drive. Schedule it nightly or weekly, or trigger it manually with one click.<br><br>Best for: businesses with their own server or IT infrastructure.</div>
-      </div>
-      <div class="info-section">
-        <div class="info-section-title">Cloud Backup <span class="info-tag tag-cloud">CLOUD</span></div>
-        <div class="info-section-body">Back up your vault to a cloud storage service of your choice — Google Drive, Dropbox, OneDrive, or your own hosted server. DocVault exports an encrypted backup file which you can store anywhere.<br><br>The backup is AES-256 encrypted, meaning even if someone accessed the file they could not read your documents without your password.<br><br>Best for: businesses without on-site servers, or as a second layer of protection alongside local backup.</div>
-      </div>
-      <div class="info-section">
-        <div class="info-section-title">Manual Backup Now</div>
-        <div class="info-section-body">At any time you can trigger an immediate backup from the Settings panel. DocVault will create a timestamped encrypted ZIP of your entire vault — all documents, all records, all settings — ready to store wherever you choose.</div>
-      </div>
-      <div class="info-section">
-        <div class="info-section-title">Restore</div>
-        <div class="info-section-body">If you ever need to move to a new computer or recover from a hardware failure, simply install DocVault, point it at your backup file, enter your password, and everything is restored exactly as it was.</div>
-      </div>
-    `
-  }
-};
-
-function openInfoModal(key) {
-  const c = infoContent[key];
-  document.getElementById('infoModalTitle').textContent = c.title;
-  document.getElementById('infoModalBody').innerHTML = c.body;
-  document.getElementById('infoModalOverlay').classList.remove('hidden');
-}
-
-function closeInfoModal() {
-  document.getElementById('infoModalOverlay').classList.add('hidden');
-}
-
-function closeInfoIfOutside(e) {
-  if (e.target === document.getElementById('infoModalOverlay')) closeInfoModal();
-}
-
-
+const docs = {
   rta: {
     title: 'Refrigerant Trading Authorisation',
     status: 'EXPIRED',
