@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DocVault HVAC</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f2f5;color:#1a1a2e;min-height:100vh}
+  .app{display:flex;height:100vh;overflow:hidden}
+
+  .sidebar{width:240px;background:#0c1a12;color:#fff;display:flex;flex-direction:column;flex-shrink:0}
+  .logo{padding:20px 16px;border-bottom:1px solid #1a2e1f}
+  .logo-mark{font-size:20px;font-weight:700;color:#fff;letter-spacing:-0.5px}
+  .logo-mark span{color:#22c55e}
+  .logo-sub{font-size:10px;color:#4b6b52;letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+  .company-badge{margin:12px;background:#1a2e1f;border-radius:8px;padding:10px 12px}
+  .company-name{font-size:12px;font-weight:600;color:#e2e8f0}
+  .company-type{font-size:10px;color:#4b6b52;margin-top:2px}
+  .nav-section{padding:8px 0}
+  .nav-label{font-size:10px;color:#4b6b52;letter-spacing:1.5px;text-transform:uppercase;padding:8px 16px 4px}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;transition:all 0.15s;font-size:13px;color:#7aad82;border-left:3px solid transparent}
+  .nav-item:hover{background:#1a2e1f;color:#e2e8f0}
+  .nav-item.active{background:#1a2e1f;color:#22c55e;border-left-color:#22c55e}
+  .staff-avatar-sm{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+  .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .dot-red{background:#ef4444}
+  .dot-amber{background:#f59e0b}
+  .dot-green{background:#22c55e}
+  .dot-blue{background:#3b82f6}
+  .nav-footer{margin-top:auto;padding:16px;border-top:1px solid #1a2e1f}
+  .version{font-size:10px;color:#4b6b52}
+
+  .main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+  .topbar{background:#fff;border-bottom:1px solid #e2e8f0;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+  .page-title{font-size:15px;font-weight:600;color:#1a1a2e}
+  .topbar-right{display:flex;align-items:center;gap:12px}
+  .alert-pill{background:#fef3c7;color:#92400e;font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;border:1px solid #fcd34d}
+  .user-avatar{width:32px;height:32px;border-radius:50%;background:#0c1a12;color:#22c55e;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+
+  .content{padding:24px;flex:1}
+
+  .score-banner{background:#0c1a12;border-radius:12px;padding:20px 24px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between}
+  .score-left h2{font-size:13px;color:#4b6b52;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+  .score-num{font-size:42px;font-weight:700;color:#fff;line-height:1}
+  .score-num span{font-size:24px;color:#4b6b52}
+  .score-label{font-size:12px;color:#22c55e;margin-top:4px;font-weight:600}
+  .score-bar-wrap{flex:1;margin:0 32px}
+  .score-bar-bg{height:8px;background:#1a2e1f;border-radius:4px;overflow:hidden}
+  .score-bar-fill{height:100%;background:linear-gradient(90deg,#f59e0b,#22c55e);border-radius:4px;width:82%}
+  .score-right{text-align:right}
+  .score-date{font-size:11px;color:#4b6b52}
+  .score-next{font-size:12px;color:#e2e8f0;margin-top:4px}
+
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+  .stat-card{background:#fff;border-radius:10px;padding:16px;border:1.5px solid #e2e8f0;cursor:pointer;transition:all 0.15s}
+  .stat-card:hover{border-color:#94a3b8;transform:translateY(-1px)}
+  .stat-card.active{border-color:#22c55e;background:#f0fdf4}
+  .stat-num{font-size:28px;font-weight:700;line-height:1}
+  .stat-label{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px}
+  .stat-card.red .stat-num{color:#ef4444}
+  .stat-card.amber .stat-num{color:#f59e0b}
+  .stat-card.green .stat-num{color:#22c55e}
+  .stat-card.blue .stat-num{color:#3b82f6}
+
+  .staff-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+  .staff-card{background:#fff;border-radius:12px;border:1.5px solid #e2e8f0;padding:20px;cursor:pointer;transition:all 0.15s}
+  .staff-card:hover{border-color:#94a3b8;box-shadow:0 4px 12px rgba(0,0,0,0.08)}
+  .staff-card-top{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+  .staff-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0}
+  .staff-name{font-size:15px;font-weight:700;color:#1a1a2e}
+  .staff-role{font-size:12px;color:#64748b;margin-top:2px}
+  .cred-list{display:flex;flex-direction:column;gap:6px}
+  .cred-row{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:#f8fafc;border-radius:7px;border:1px solid #e2e8f0}
+  .cred-name{font-size:12px;color:#475569;font-weight:500}
+  .cred-expiry{font-size:11px;color:#94a3b8}
+  .cred-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:12px}
+  .badge-red{background:#fef2f2;color:#dc2626}
+  .badge-amber{background:#fffbeb;color:#d97706}
+  .badge-green{background:#f0fdf4;color:#16a34a}
+  .badge-blue{background:#eff6ff;color:#2563eb}
+  .staff-alert{margin-top:12px;padding:8px 10px;background:#fef2f2;border-radius:7px;font-size:11px;color:#dc2626;font-weight:600}
+  .staff-ok{margin-top:12px;padding:8px 10px;background:#f0fdf4;border-radius:7px;font-size:11px;color:#16a34a;font-weight:500}
+  .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .section-title{font-size:13px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.5px}
+
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
+  .modal-overlay.hidden{display:none}
+  .modal{background:#fff;border-radius:14px;width:100%;max-width:620px;max-height:92vh;overflow-y:auto}
+  .modal-header{padding:20px 24px 0;display:flex;align-items:center;gap:14px}
+  .modal-avatar{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0}
+  .modal-name{font-size:18px;font-weight:700;color:#1a1a2e}
+  .modal-role{font-size:13px;color:#64748b;margin-top:2px}
+  .modal-close-wrap{margin-left:auto}
+  .modal-close{width:32px;height:32px;border-radius:50%;border:none;background:#f1f5f9;cursor:pointer;font-size:18px;color:#64748b;display:flex;align-items:center;justify-content:center}
+  .modal-body{padding:20px 24px 24px}
+  .cred-section-title{font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin:16px 0 8px}
+  .cred-detail-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px;margin-bottom:8px;cursor:pointer;transition:all 0.15s}
+  .cred-detail-card:hover{border-color:#94a3b8;background:#f1f5f9}
+  .cred-detail-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .cred-detail-name{font-size:13px;font-weight:600;color:#1a1a2e}
+  .cred-detail-fields{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .cred-field{font-size:11px}
+  .cred-field-label{color:#94a3b8}
+  .cred-field-value{color:#475569;font-weight:600}
+  .doc-viewer-mini{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:20px;margin-top:12px}
+  .doc-viewer-header{background:#0c1a12;color:#fff;padding:10px 14px;border-radius:6px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:600}
+  .pdf-field{display:flex;gap:8px;margin-bottom:6px}
+  .pdf-field-label{font-size:11px;color:#94a3b8;min-width:150px;font-weight:600}
+  .pdf-field-value{font-size:11px;color:#1a1a2e}
+  .pdf-seal{margin-top:14px;padding-top:12px;border-top:1px solid #e2e8f0;display:flex;align-items:center;gap:10px}
+  .seal-circle{width:44px;height:44px;border-radius:50%;border:3px solid #0c1a12;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;text-align:center;color:#0c1a12;line-height:1.1;flex-shrink:0}
+  .seal-text{font-size:11px;color:#64748b}
+  .modal-actions{display:flex;gap:10px;margin-top:16px}
+  .btn{padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all 0.15s}
+  .btn-primary{background:#0c1a12;color:#fff}
+  .btn-primary:hover{background:#1a2e1f}
+  .btn-secondary{background:#f1f5f9;color:#475569}
+  .btn-secondary:hover{background:#e2e8f0}
+  .doc-expiry-warn{font-size:12px;color:#ef4444;font-weight:600;margin-top:8px}
+  .doc-expiry-ok{font-size:12px;color:#16a34a;margin-top:8px}
+  .back-btn{background:none;border:none;color:#22c55e;font-size:13px;font-weight:600;cursor:pointer;padding:0;margin-bottom:12px;display:none}
+
+  @media(max-width:768px){
+    .sidebar{display:none}
+    .stat-grid{grid-template-columns:repeat(2,1fr)}
+    .score-banner{flex-direction:column;gap:16px}
+    .score-bar-wrap{width:100%;margin:0}
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="sidebar">
+    <div class="logo">
+      <div class="logo-mark">Doc<span>Vault</span></div>
+      <div class="logo-sub">HVAC Edition</div>
+    </div>
+    <div class="company-badge">
+      <div class="company-name">ProFreeze Air Pty Ltd</div>
+      <div class="company-type">HVAC Installer · NSW</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Dashboard</div>
+      <div class="nav-item active" onclick="showAll()" id="nav-all">
+        <div class="dot dot-blue"></div>All Staff
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Technicians</div>
+      <div class="nav-item" onclick="showStaff('tom')">
+        <div class="staff-avatar-sm" style="background:#dbeafe;color:#1d4ed8">TH</div>Tom Hartley
+      </div>
+      <div class="nav-item" onclick="showStaff('priya')">
+        <div class="staff-avatar-sm" style="background:#dcfce7;color:#15803d">PK</div>Priya Kaur
+      </div>
+      <div class="nav-item" onclick="showStaff('jason')">
+        <div class="staff-avatar-sm" style="background:#fef3c7;color:#b45309">JM</div>Jason Mbuyi
+      </div>
+      <div class="nav-item" onclick="showStaff('sarah')">
+        <div class="staff-avatar-sm" style="background:#fce7f3;color:#be185d">SO</div>Sarah O'Brien
+      </div>
+      <div class="nav-item" onclick="showStaff('dan')">
+        <div class="staff-avatar-sm" style="background:#ede9fe;color:#7c3aed">DL</div>Dan Lowe
+      </div>
+    </div>
+    <div class="nav-footer">
+      <div class="version">DocVault HVAC v1.0 · WenMar Digital</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="page-title" id="pageTitle">Staff Credentials Overview</div>
+      <div class="topbar-right">
+        <div class="alert-pill">⚠ 3 credentials expiring soon</div>
+        <div class="user-avatar">PM</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="score-banner">
+        <div class="score-left">
+          <h2>Team Compliance Score</h2>
+          <div class="score-num">82<span>%</span></div>
+          <div class="score-label">✓ Good Standing</div>
+        </div>
+        <div class="score-bar-wrap">
+          <div class="score-bar-bg"><div class="score-bar-fill"></div></div>
+        </div>
+        <div class="score-right">
+          <div class="score-date">Last checked: 27 May 2026</div>
+          <div class="score-next">22 of 27 credentials current</div>
+        </div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card red" onclick="filterStat('expired')" id="card-expired">
+          <div class="stat-num">2</div>
+          <div class="stat-label">Expired</div>
+        </div>
+        <div class="stat-card amber" onclick="filterStat('due')" id="card-due">
+          <div class="stat-num">3</div>
+          <div class="stat-label">Due Soon</div>
+        </div>
+        <div class="stat-card green" onclick="filterStat('current')" id="card-current">
+          <div class="stat-num">22</div>
+          <div class="stat-label">Current</div>
+        </div>
+        <div class="stat-card blue" id="card-staff">
+          <div class="stat-num">5</div>
+          <div class="stat-label">Technicians</div>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <div class="section-title" id="sectionTitle">All Technicians</div>
+        <div style="font-size:12px;color:#94a3b8" id="staffCount">5 staff members</div>
+      </div>
+
+      <div class="staff-grid" id="staffGrid">
+
+        <div class="staff-card" onclick="openStaff('tom')" id="staff-tom">
+          <div class="staff-card-top">
+            <div class="staff-avatar" style="background:#dbeafe;color:#1d4ed8">TH</div>
+            <div>
+              <div class="staff-name">Tom Hartley</div>
+              <div class="staff-role">Senior Refrigeration Mechanic</div>
+            </div>
+          </div>
+          <div class="cred-list">
+            <div class="cred-row"><span class="cred-name">ARCtick RHL</span><span class="cred-expiry">Exp: 14 Sep 2027</span><span class="cred-badge badge-green">OK</span></div>
+            <div class="cred-row"><span class="cred-name">Electrical Licence</span><span class="cred-expiry">Exp: 3 Mar 2026</span><span class="cred-badge badge-red">EXPIRED</span></div>
+            <div class="cred-row"><span class="cred-name">NSW Contractor Lic.</span><span class="cred-expiry">Exp: 22 Nov 2027</span><span class="cred-badge badge-green">OK</span></div>
+            <div class="cred-row"><span class="cred-name">White Card</span><span class="cred-expiry">No expiry</span><span class="cred-badge badge-blue">ON FILE</span></div>
+            <div class="cred-row"><span class="cred-name">First Aid Cert</span><span class="cred-expiry">Exp: 12 Jun 2026</span><span class="cred-badge badge-amber">DUE SOON</span></div>
+          </div>
+          <div class="staff-alert">⚠ Electrical licence expired — cannot do electrical work legally</div>
+        </div>
+
+        <div class="staff-card" onclick="openStaff('priya')" id="staff-priya">
+          <div class="staff-card-top">
+            <div class="staff-avatar" style="background:#dcfce7;color:#15803d">PK</div>
+            <div>
+              <div class="staff-name">Priya Kaur</div>
+              <div class="staff-role">Refrigeration Mechanic</div>
+            </div>
+          </div>
+          <div class="cred-list">
+            <div class="cred-row"><span class="cred-name">ARCtick RHL</span><span class="cred-expiry">Exp: 7 Feb 2028</span><span class="cred-badge badge-green">OK</span></div>
+            <div class="cred-row"><span class="cred-name">Electrical Licence</span><span class="cred-expiry">Exp: 19 Aug 2027</span><span class="cred-badge badge-green">OK</span></div>
+            <div class="cred-row"><span class="cred-name">NSW Contractor Lic.</span><span class="cred-expiry">Exp: 18 Aug 2027</span><span class="cred-badge badge-green">OK</span></div>
+            <div class="cred-row"><span class="cred-name">White Card</span><span class="cred-expiry">No expiry</span><span class="cred-badge badge-blue">ON FILE</span></div>
+            <div class="cred-row"><span class="cred-name">First Aid Cert</span><span class="cred-expiry">Exp: 4 Nov 2027</span><span class="cred-badge badge-green">OK</span></div>
+          </div>
+          <div class="staff-ok">✓ All credentials current</div>
+        </div>
+
+        <div class="staff-card" onclick="openStaff('jason')" id="staff-jason">
+          <div class="staff-card-top">
+            <div class="staff-avatar" style="background:#fef3c7;color:#b45309">JM</div>
+            <div>
+              <div class="staff-name">Jason Mbuyi</div>
+              <div class="staff-role">HVAC Installer</div>
+            </div>
+          </div>
+          <div class="cred-list">
+            <div class="cred-row"><span class="cred-name">ARCtick RHL</span><span class="cred-expiry">Exp: 30 Jun 2026</span><span class="cred-badge badge-amber">DUE SOON</span></div>
+            <div class="cred-row"><span class="cred-name">Electrical Licence</span><span class="cred-expiry">Exp: 15 Dec 2027</span><span class="cred-badge badge-green">OK</span></div>
+            <div class="cred-row"><span class="cred-name">NSW Contractor Lic.</span><span class="cred-expiry">Exp: 14 Dec 2027</span><span class="cred-badge badge-green">OK</span></div>
+            <div class="cred-row"><span class="cred-name">White Card</span><span class="cred-expiry">No expiry</span><span class="cred-badge badge-blue">ON FILE</span></div>
+            <div class="cred-row"><span class="cred-name">First Aid Cert</span><span class="cred-expiry">Exp: 9 Sep 2027</span><span class="cred-badge badge-green">OK</span></div>
+          </div>
+          <div class="staff-alert" style="background:#fffbeb;color:#d97706">⏰ ARCtick RHL expires in 34 days — renew now</div>
+        </div>
+
+        <div class="staff-card" onclick="openStaff('sarah')" id="staff-sarah">
+          <div class="staff-card-top">
+            <div class="staff-avatar" style="background:#fce7f3;color:#be185d">SO</div>
+            <div>
+              <div class="staff-name">Sarah O'Brien</div>
+              <div class="staff-role">Apprentice — 3rd Year</div>
+            </div>
+          </div>
+          <div class="cred-list">
+            <div class="cred-row"><span class="cred-name">ARCtick RHL (Trainee)</span><span class="cred-expiry">Exp: 1 Mar 2027</span><span class="cred-badge badge-green">OK</span></div>
+            <div class="cred-row"><span class="cred-name">Apprenticeship Contract</span><span class="cred-expiry">Exp: 30 Sep 2026</span><span class="cred-badge badge-green">OK</span></div>
+            <div class="cred-row"><span class="cred-name">White Card</span><span class="cred-expiry">No expiry</span><span class="cred-badge badge-blue">ON FILE</span></div>
+            <div class="cred-row"><span class="cred-name">First Aid Cert</span><span class="cred-expiry">Exp: 17 Jul 2026</span><span class="cred-badge badge-amber">DUE SOON</span></div>
+            <div class="cred-row"><span class="cred-name">Supervision Record</span><span class="cred-expiry">Current</span><span class="cred-badge badge-green">OK</span></div>
+          </div>
+          <div class="staff-ok" style="background:#fffbeb;color:#92400e">⏰ First Aid renewal due in 51 days</div>
+        </div>
+
+        <div class="staff-card" onclick="openStaff('dan')" id="staff-dan">
+          <div class="staff-card-top">
+            <div class="staff-avatar" style="background:#ede9fe;color:#7c3aed">DL</div>
+            <div>
+              <div class="staff-name">Dan Lowe</div>
+              <div class="staff-role">Refrigeration Mechanic</div>
+            </div>
+          </div>
+          <div class="cred-list">
+            <div class="cred-row"><span class="cred-name">ARCtick RHL</span><span class="cred-expiry">Exp: 28 Jan 2028</span><span class="cred-badge badge-green">OK</span></div>
+            <div class="cred-row"><span class="cred-name">Electrical Licence</span><span class="cred-expiry">Exp: 4 Feb 2025</span><span class="cred-badge badge-red">EXPIRED</span></div>
+            <div class="cred-row"><span class="cred-name">NSW Contractor Lic.</span><span class="cred-expiry">Exp: 3 Oct 2028</span><span class="cred-badge badge-green">OK</span></div>
+            <div class="cred-row"><span class="cred-name">White Card</span><span class="cred-expiry">No expiry</span><span class="cred-badge badge-blue">ON FILE</span></div>
+            <div class="cred-row"><span class="cred-name">First Aid Cert</span><span class="cred-expiry">Exp: 22 Mar 2028</span><span class="cred-badge badge-green">OK</span></div>
+          </div>
+          <div class="staff-alert">⚠ Electrical licence expired Feb 2025 — must not perform electrical work</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay hidden" id="modalOverlay" onclick="closeIfOutside(event)">
+  <div class="modal">
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+const staffData = {
+  tom: {
+    name:'Tom Hartley', role:'Senior Refrigeration Mechanic',
+    avatarBg:'#dbeafe', avatarColor:'#1d4ed8', initials:'TH',
+    creds:[
+      {name:'ARCtick Refrigerant Handling Licence',num:'RHL-NSW-44821-A',issuer:'Australian Refrigeration Council',class:'Class B — Full',issued:'15 Sep 2022',expires:'14 Sep 2027',status:'current',seal:'ARC\nARCtick',sealText:'Australian Refrigeration Council — National Licence Scheme'},
+      {name:'NSW Electrical Contractor Licence',num:'EL-NSW-208012',issuer:'NSW Fair Trading',class:'Unrestricted',issued:'4 Mar 2021',expires:'3 Mar 2026',status:'expired',seal:'NSW\nFair\nTrade',sealText:'NSW Fair Trading — Dept. of Customer Service'},
+      {name:'NSW Contractor Licence — Refrigeration',num:'LIC-RF-NSW-119944',issuer:'NSW Fair Trading',class:'Refrigeration & AC',issued:'23 Nov 2022',expires:'22 Nov 2027',status:'current',seal:'NSW\nFair\nTrade',sealText:'NSW Fair Trading — Dept. of Customer Service'},
+      {name:'White Card — General Construction Induction',num:'WC-NSW-TH-2018-0041',issuer:'SafeWork NSW',class:'General Induction',issued:'8 Feb 2018',expires:'No expiry',status:'onfile',seal:'Safe\nWork',sealText:'SafeWork NSW — National White Card Scheme'},
+      {name:'Provide First Aid Certificate',num:'HLTAID011-2024-0882',issuer:'St John Ambulance Australia',class:'HLTAID011',issued:'13 Jun 2024',expires:'12 Jun 2026',status:'due',seal:'St\nJohn',sealText:'St John Ambulance — Nationally recognised training'}
+    ]
+  },
+  priya: {
+    name:'Priya Kaur', role:'Refrigeration Mechanic',
+    avatarBg:'#dcfce7', avatarColor:'#15803d', initials:'PK',
+    creds:[
+      {name:'ARCtick Refrigerant Handling Licence',num:'RHL-NSW-51902-B',issuer:'Australian Refrigeration Council',class:'Class B — Full',issued:'8 Feb 2023',expires:'7 Feb 2028',status:'current',seal:'ARC\nARCtick',sealText:'Australian Refrigeration Council'},
+      {name:'NSW Electrical Contractor Licence',num:'EL-NSW-331741',issuer:'NSW Fair Trading',class:'Unrestricted',issued:'20 Aug 2022',expires:'19 Aug 2027',status:'current',seal:'NSW\nFair\nTrade',sealText:'NSW Fair Trading'},
+      {name:'NSW Contractor Licence — Refrigeration',num:'LIC-RF-NSW-224418',issuer:'NSW Fair Trading',class:'Refrigeration & AC',issued:'19 Aug 2022',expires:'18 Aug 2027',status:'current',seal:'NSW\nFair\nTrade',sealText:'NSW Fair Trading'},
+      {name:'White Card — General Construction Induction',num:'WC-NSW-PK-2020-0312',issuer:'SafeWork NSW',class:'General Induction',issued:'3 Sep 2020',expires:'No expiry',status:'onfile',seal:'Safe\nWork',sealText:'SafeWork NSW'},
+      {name:'Provide First Aid Certificate',num:'HLTAID011-2025-1104',issuer:'St John Ambulance Australia',class:'HLTAID011',issued:'5 Nov 2025',expires:'4 Nov 2027',status:'current',seal:'St\nJohn',sealText:'St John Ambulance'}
+    ]
+  },
+  jason: {
+    name:'Jason Mbuyi', role:'HVAC Installer',
+    avatarBg:'#fef3c7', avatarColor:'#b45309', initials:'JM',
+    creds:[
+      {name:'ARCtick Refrigerant Handling Licence',num:'RHL-NSW-60441-C',issuer:'Australian Refrigeration Council',class:'Class C — Split Systems',issued:'1 Jul 2023',expires:'30 Jun 2026',status:'due',seal:'ARC\nARCtick',sealText:'Australian Refrigeration Council'},
+      {name:'NSW Electrical Contractor Licence',num:'EL-NSW-419008',issuer:'NSW Fair Trading',class:'Unrestricted',issued:'16 Dec 2022',expires:'15 Dec 2027',status:'current',seal:'NSW\nFair\nTrade',sealText:'NSW Fair Trading'},
+      {name:'NSW Contractor Licence — Refrigeration',num:'LIC-RF-NSW-281109',issuer:'NSW Fair Trading',class:'Refrigeration & AC',issued:'15 Dec 2022',expires:'14 Dec 2027',status:'current',seal:'NSW\nFair\nTrade',sealText:'NSW Fair Trading'},
+      {name:'White Card — General Construction Induction',num:'WC-NSW-JM-2019-0187',issuer:'SafeWork NSW',class:'General Induction',issued:'21 Apr 2019',expires:'No expiry',status:'onfile',seal:'Safe\nWork',sealText:'SafeWork NSW'},
+      {name:'Provide First Aid Certificate',num:'HLTAID011-2025-0741',issuer:'St John Ambulance Australia',class:'HLTAID011',issued:'10 Sep 2025',expires:'9 Sep 2027',status:'current',seal:'St\nJohn',sealText:'St John Ambulance'}
+    ]
+  },
+  sarah: {
+    name:"Sarah O'Brien", role:'Apprentice — 3rd Year',
+    avatarBg:'#fce7f3', avatarColor:'#be185d', initials:'SO',
+    creds:[
+      {name:'ARCtick RHL — Trainee Licence',num:'RHL-NSW-T-88441',issuer:'Australian Refrigeration Council',class:'Trainee — supervised only',issued:'2 Mar 2024',expires:'1 Mar 2027',status:'current',seal:'ARC\nARCtick',sealText:'Australian Refrigeration Council'},
+      {name:'Apprenticeship Training Contract',num:'ATC-NSW-2023-44182',issuer:'TAFE NSW / Training Services',class:'Cert III — RAC',issued:'1 Oct 2023',expires:'30 Sep 2026',status:'current',seal:'TAFE\nNSW',sealText:'TAFE NSW — Training Services NSW'},
+      {name:'White Card — General Construction Induction',num:'WC-NSW-SO-2023-0901',issuer:'SafeWork NSW',class:'General Induction',issued:'15 Sep 2023',expires:'No expiry',status:'onfile',seal:'Safe\nWork',sealText:'SafeWork NSW'},
+      {name:'Provide First Aid Certificate',num:'HLTAID011-2024-0312',issuer:'St John Ambulance Australia',class:'HLTAID011',issued:'18 Jul 2024',expires:'17 Jul 2026',status:'due',seal:'St\nJohn',sealText:'St John Ambulance'},
+      {name:'Supervision Record — Apprentice',num:'SUP-NSW-SO-2024',issuer:'ProFreeze Air Pty Ltd',class:'Internal record',issued:'1 Oct 2023',expires:'Current',status:'current',seal:'PFA',sealText:'ProFreeze Air Pty Ltd — Internal compliance record'}
+    ]
+  },
+  dan: {
+    name:'Dan Lowe', role:'Refrigeration Mechanic',
+    avatarBg:'#ede9fe', avatarColor:'#7c3aed', initials:'DL',
+    creds:[
+      {name:'ARCtick Refrigerant Handling Licence',num:'RHL-NSW-39014-B',issuer:'Australian Refrigeration Council',class:'Class B — Full',issued:'29 Jan 2023',expires:'28 Jan 2028',status:'current',seal:'ARC\nARCtick',sealText:'Australian Refrigeration Council'},
+      {name:'NSW Electrical Contractor Licence',num:'EL-NSW-188247',issuer:'NSW Fair Trading',class:'Unrestricted',issued:'5 Feb 2020',expires:'4 Feb 2025',status:'expired',seal:'NSW\nFair\nTrade',sealText:'NSW Fair Trading'},
+      {name:'NSW Contractor Licence — Refrigeration',num:'LIC-RF-NSW-301842',issuer:'NSW Fair Trading',class:'Refrigeration & AC',issued:'4 Oct 2023',expires:'3 Oct 2028',status:'current',seal:'NSW\nFair\nTrade',sealText:'NSW Fair Trading'},
+      {name:'White Card — General Construction Induction',num:'WC-NSW-DL-2016-0044',issuer:'SafeWork NSW',class:'General Induction',issued:'12 Jan 2016',expires:'No expiry',status:'onfile',seal:'Safe\nWork',sealText:'SafeWork NSW'},
+      {name:'Provide First Aid Certificate',num:'HLTAID011-2026-0219',issuer:'St John Ambulance Australia',class:'HLTAID011',issued:'23 Mar 2026',expires:'22 Mar 2028',status:'current',seal:'St\nJohn',sealText:'St John Ambulance'}
+    ]
+  }
+};
+
+let currentStaff = null;
+let currentCredIndex = null;
+
+function statusBadge(s) {
+  const map = {current:'badge-green',expired:'badge-red',due:'badge-amber',onfile:'badge-blue'};
+  const labels = {current:'CURRENT',expired:'EXPIRED',due:'DUE SOON',onfile:'ON FILE'};
+  return `<span class="cred-badge ${map[s]||'badge-blue'}">${labels[s]||s}</span>`;
+}
+
+function openStaff(key) {
+  const s = staffData[key];
+  if (!s) return;
+  currentStaff = key;
+  currentCredIndex = null;
+  renderStaffModal(s);
+  document.getElementById('modalOverlay').classList.remove('hidden');
+}
+
+function renderStaffModal(s) {
+  const credsHtml = s.creds.map((c,i) => `
+    <div class="cred-detail-card" onclick="openCred(${i})">
+      <div class="cred-detail-top">
+        <div class="cred-detail-name">${c.name}</div>
+        ${statusBadge(c.status)}
+      </div>
+      <div class="cred-detail-fields">
+        <div class="cred-field"><span class="cred-field-label">Licence No: </span><span class="cred-field-value">${c.num}</span></div>
+        <div class="cred-field"><span class="cred-field-label">Issuer: </span><span class="cred-field-value">${c.issuer}</span></div>
+        <div class="cred-field"><span class="cred-field-label">Issued: </span><span class="cred-field-value">${c.issued}</span></div>
+        <div class="cred-field"><span class="cred-field-label">Expires: </span><span class="cred-field-value">${c.expires}</span></div>
+      </div>
+      <div style="font-size:11px;color:#94a3b8;margin-top:6px">Click to view document →</div>
+    </div>
+  `).join('');
+
+  document.getElementById('modalContent').innerHTML = `
+    <div class="modal-header">
+      <div class="modal-avatar" style="background:${s.avatarBg};color:${s.avatarColor}">${s.initials}</div>
+      <div>
+        <div class="modal-name">${s.name}</div>
+        <div class="modal-role">${s.role}</div>
+      </div>
+      <div class="modal-close-wrap"><button class="modal-close" onclick="closeModal()">✕</button></div>
+    </div>
+    <div class="modal-body">
+      <div class="cred-section-title">Credentials &amp; Licences</div>
+      ${credsHtml}
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+  `;
+}
+
+function openCred(i) {
+  const s = staffData[currentStaff];
+  const c = s.creds[i];
+  currentCredIndex = i;
+  const noteHtml = c.status === 'expired'
+    ? `<div class="doc-expiry-warn">⚠ This licence has expired. This staff member cannot legally perform work requiring this credential.</div>`
+    : c.status === 'due'
+    ? `<div class="doc-expiry-warn">⏰ This credential is due for renewal within 60 days. Contact the issuing authority.</div>`
+    : `<div class="doc-expiry-ok">✓ Credential is current and valid.</div>`;
+
+  document.getElementById('modalContent').innerHTML = `
+    <div class="modal-header">
+      <div class="modal-avatar" style="background:${s.avatarBg};color:${s.avatarColor}">${s.initials}</div>
+      <div>
+        <div class="modal-name">${c.name}</div>
+        <div class="modal-role">${s.name} · ${s.role}</div>
+      </div>
+      <div class="modal-close-wrap"><button class="modal-close" onclick="closeModal()">✕</button></div>
+    </div>
+    <div class="modal-body">
+      <button class="back-btn" style="display:block" onclick="openStaff('${currentStaff}')">← Back to ${s.name}</button>
+      <div class="doc-viewer-mini">
+        <div class="doc-viewer-header"><span>${c.name}</span><span>OFFICIAL DOCUMENT</span></div>
+        <div class="pdf-field"><span class="pdf-field-label">Document/Licence No.</span><span class="pdf-field-value">${c.num}</span></div>
+        <div class="pdf-field"><span class="pdf-field-label">Issued To</span><span class="pdf-field-value">${s.name}</span></div>
+        <div class="pdf-field"><span class="pdf-field-label">Issued By</span><span class="pdf-field-value">${c.issuer}</span></div>
+        <div class="pdf-field"><span class="pdf-field-label">Class / Type</span><span class="pdf-field-value">${c.class}</span></div>
+        <div class="pdf-field"><span class="pdf-field-label">Issue Date</span><span class="pdf-field-value">${c.issued}</span></div>
+        <div class="pdf-field"><span class="pdf-field-label">Expiry Date</span><span class="pdf-field-value">${c.expires}</span></div>
+        <div class="pdf-seal">
+          <div class="seal-circle">${c.seal}</div>
+          <div class="seal-text">${c.sealText}</div>
+        </div>
+      </div>
+      ${noteHtml}
+      <div class="modal-actions" style="margin-top:16px">
+        <button class="btn btn-primary">⬇ Download</button>
+        <button class="btn btn-secondary">✏ Edit Details</button>
+        <button class="btn btn-secondary" onclick="openStaff('${currentStaff}')">← Back</button>
+      </div>
+    </div>
+  `;
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.add('hidden');
+  currentStaff = null;
+}
+
+function closeIfOutside(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+function showStaff(key) {
+  openStaff(key);
+}
+
+function showAll() {
+  document.querySelectorAll('.staff-card').forEach(c => c.style.display = '');
+  document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach((n,i) => n.classList.toggle('active', i===0));
+  document.getElementById('sectionTitle').textContent = 'All Technicians';
+  document.getElementById('staffCount').textContent = '5 staff members';
+  document.getElementById('pageTitle').textContent = 'Staff Credentials Overview';
+}
+
+function filterStat(type) {
+  document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+  document.getElementById('card-' + type).classList.add('active');
+  const labels = {expired:'Staff with Expired Credentials',due:'Staff with Credentials Due Soon',current:'Staff — All Current'};
+  document.getElementById('pageTitle').textContent = labels[type] || 'Staff';
+  document.getElementById('sectionTitle').textContent = labels[type] || 'Staff';
+  const map = {expired:['tom','dan'], due:['jason','sarah'], current:['priya']};
+  const show = map[type] || [];
+  document.querySelectorAll('.staff-card').forEach(c => {
+    const id = c.id.replace('staff-','');
+    c.style.display = show.includes(id) ? '' : 'none';
+  });
+  const visible = show.length;
+  document.getElementById('staffCount').textContent = visible + ' staff member' + (visible !== 1 ? 's' : '');
+}
+</script>
+</body>
+</html>

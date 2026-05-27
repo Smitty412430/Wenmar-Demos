@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DocVault ACP</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f2f5;color:#1a1a2e;min-height:100vh}
+  .app{display:flex;height:100vh;overflow:hidden}
+
+  /* Sidebar */
+  .sidebar{width:240px;background:#0f1623;color:#fff;display:flex;flex-direction:column;flex-shrink:0}
+  .logo{padding:20px 16px;border-bottom:1px solid #1e2a3a}
+  .logo-mark{font-size:20px;font-weight:700;color:#fff;letter-spacing:-0.5px}
+  .logo-mark span{color:#f59e0b}
+  .logo-sub{font-size:10px;color:#64748b;letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+  .company-badge{margin:12px;background:#1e2a3a;border-radius:8px;padding:10px 12px}
+  .company-name{font-size:12px;font-weight:600;color:#e2e8f0}
+  .company-type{font-size:10px;color:#64748b;margin-top:2px}
+  .nav-section{padding:8px 0}
+  .nav-label{font-size:10px;color:#475569;letter-spacing:1.5px;text-transform:uppercase;padding:8px 16px 4px}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;transition:all 0.15s;font-size:13px;color:#94a3b8;border-left:3px solid transparent}
+  .nav-item:hover{background:#1e2a3a;color:#e2e8f0}
+  .nav-item.active{background:#1e2a3a;color:#f59e0b;border-left-color:#f59e0b}
+  .nav-item .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .dot-red{background:#ef4444}
+  .dot-amber{background:#f59e0b}
+  .dot-green{background:#22c55e}
+  .dot-blue{background:#3b82f6}
+  .nav-footer{margin-top:auto;padding:16px;border-top:1px solid #1e2a3a}
+  .version{font-size:10px;color:#475569}
+
+  /* Main */
+  .main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+  .topbar{background:#fff;border-bottom:1px solid #e2e8f0;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+  .page-title{font-size:15px;font-weight:600;color:#1a1a2e}
+  .topbar-right{display:flex;align-items:center;gap:12px}
+  .alert-pill{background:#fef3c7;color:#92400e;font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;border:1px solid #fcd34d}
+  .user-avatar{width:32px;height:32px;border-radius:50%;background:#0f1623;color:#f59e0b;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+
+  .content{padding:24px;flex:1}
+
+  /* Score banner */
+  .score-banner{background:#0f1623;border-radius:12px;padding:20px 24px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between}
+  .score-left h2{font-size:13px;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+  .score-num{font-size:42px;font-weight:700;color:#fff;line-height:1}
+  .score-num span{font-size:24px;color:#64748b}
+  .score-label{font-size:12px;color:#f59e0b;margin-top:4px;font-weight:600}
+  .score-bar-wrap{flex:1;margin:0 32px}
+  .score-bar-bg{height:8px;background:#1e2a3a;border-radius:4px;overflow:hidden}
+  .score-bar-fill{height:100%;background:linear-gradient(90deg,#f59e0b,#22c55e);border-radius:4px;width:75%}
+  .score-right{text-align:right}
+  .score-date{font-size:11px;color:#64748b}
+  .score-next{font-size:12px;color:#e2e8f0;margin-top:4px}
+
+  /* Stat cards */
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+  .stat-card{background:#fff;border-radius:10px;padding:16px;border:1.5px solid #e2e8f0;cursor:pointer;transition:all 0.15s}
+  .stat-card:hover{border-color:#94a3b8;transform:translateY(-1px)}
+  .stat-card.active{border-color:#f59e0b;background:#fffbeb}
+  .stat-num{font-size:28px;font-weight:700;line-height:1}
+  .stat-label{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px}
+  .stat-card.red .stat-num{color:#ef4444}
+  .stat-card.amber .stat-num{color:#f59e0b}
+  .stat-card.green .stat-num{color:#22c55e}
+  .stat-card.blue .stat-num{color:#3b82f6}
+
+  /* Doc grid */
+  .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .section-title{font-size:13px;font-weight:600;color:#475569;text-transform:uppercase;letter-spacing:0.5px}
+  .doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+  .doc-card{background:#fff;border-radius:10px;border:1.5px solid #e2e8f0;padding:16px;cursor:pointer;transition:all 0.15s}
+  .doc-card:hover{border-color:#94a3b8;box-shadow:0 4px 12px rgba(0,0,0,0.08)}
+  .doc-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+  .doc-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .doc-icon.red{background:#fef2f2}
+  .doc-icon.amber{background:#fffbeb}
+  .doc-icon.green{background:#f0fdf4}
+  .doc-icon.blue{background:#eff6ff}
+  .status-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;letter-spacing:0.5px}
+  .badge-red{background:#fef2f2;color:#dc2626}
+  .badge-amber{background:#fffbeb;color:#d97706}
+  .badge-green{background:#f0fdf4;color:#16a34a}
+  .badge-blue{background:#eff6ff;color:#2563eb}
+  .doc-name{font-size:13px;font-weight:600;color:#1a1a2e;margin-bottom:4px;line-height:1.3}
+  .doc-meta{font-size:11px;color:#94a3b8}
+  .doc-dates{display:flex;gap:16px;margin-top:10px;padding-top:10px;border-top:1px solid #f1f5f9}
+  .doc-date-item label{font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;display:block}
+  .doc-date-item span{font-size:12px;font-weight:600;color:#475569}
+  .doc-expiry-warn{font-size:11px;color:#ef4444;margin-top:8px;font-weight:600}
+  .doc-expiry-ok{font-size:11px;color:#16a34a;margin-top:8px;font-weight:500}
+
+  /* Modal */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
+  .modal-overlay.hidden{display:none}
+  .modal{background:#fff;border-radius:14px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto}
+  .modal-header{padding:20px 24px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between}
+  .modal-title{font-size:16px;font-weight:700;color:#1a1a2e}
+  .modal-close{width:32px;height:32px;border-radius:50%;border:none;background:#f1f5f9;cursor:pointer;font-size:18px;color:#64748b;display:flex;align-items:center;justify-content:center}
+  .modal-body{padding:24px}
+  .pdf-viewer{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:24px;margin-bottom:20px;min-height:280px}
+  .pdf-header{background:#0f1623;color:#fff;padding:12px 16px;border-radius:6px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+  .pdf-header-title{font-size:13px;font-weight:600}
+  .pdf-header-logo{font-size:10px;color:#64748b}
+  .pdf-body p{font-size:12px;color:#475569;line-height:1.8;margin-bottom:8px}
+  .pdf-field{display:flex;gap:8px;margin-bottom:6px}
+  .pdf-field-label{font-size:11px;color:#94a3b8;min-width:140px;font-weight:600}
+  .pdf-field-value{font-size:11px;color:#1a1a2e}
+  .pdf-seal{margin-top:20px;padding-top:16px;border-top:1px solid #e2e8f0;display:flex;align-items:center;gap:10px}
+  .seal-circle{width:48px;height:48px;border-radius:50%;border:3px solid #0f1623;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;text-align:center;color:#0f1623;line-height:1.1}
+  .seal-text{font-size:11px;color:#64748b}
+  .modal-actions{display:flex;gap:10px}
+  .btn{padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all 0.15s}
+  .btn-primary{background:#0f1623;color:#fff}
+  .btn-primary:hover{background:#1e2a3a}
+  .btn-secondary{background:#f1f5f9;color:#475569}
+  .btn-secondary:hover{background:#e2e8f0}
+  .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+  .detail-item{background:#f8fafc;border-radius:8px;padding:12px}
+  .detail-label{font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+  .detail-value{font-size:13px;font-weight:600;color:#1a1a2e}
+
+  /* filter active state */
+  .doc-card.hidden{display:none}
+
+  @media(max-width:768px){
+    .sidebar{display:none}
+    .stat-grid{grid-template-columns:repeat(2,1fr)}
+    .score-banner{flex-direction:column;gap:16px}
+    .score-bar-wrap{width:100%;margin:0}
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo">
+      <div class="logo-mark">Doc<span>Vault</span></div>
+      <div class="logo-sub">ACP Edition</div>
+    </div>
+    <div class="company-badge">
+      <div class="company-name">Coastal Climate Solutions</div>
+      <div class="company-type">Air Conditioning Provider · NSW</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Dashboard</div>
+      <div class="nav-item active" onclick="showAll()">
+        <div class="dot dot-blue"></div>Overview
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Categories</div>
+      <div class="nav-item" onclick="filterCat('rta')"><div class="dot dot-amber"></div>Refrigerant Auth (RTA)</div>
+      <div class="nav-item" onclick="filterCat('reps')"><div class="dot dot-green"></div>REPS Accreditation</div>
+      <div class="nav-item" onclick="filterCat('insurance')"><div class="dot dot-red"></div>Insurance</div>
+      <div class="nav-item" onclick="filterCat('licence')"><div class="dot dot-green"></div>Licences &amp; Registration</div>
+      <div class="nav-item" onclick="filterCat('financial')"><div class="dot dot-blue"></div>Financial &amp; Tax</div>
+      <div class="nav-item" onclick="filterCat('contracts')"><div class="dot dot-green"></div>Contracts &amp; Agreements</div>
+    </div>
+    <div class="nav-footer">
+      <div class="version">DocVault ACP v1.0 · WenMar Digital</div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <div class="page-title" id="pageTitle">Compliance Overview</div>
+      <div class="topbar-right">
+        <div class="alert-pill">⚠ 2 expiring within 60 days</div>
+        <div class="user-avatar">SC</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- Score Banner -->
+      <div class="score-banner">
+        <div class="score-left">
+          <h2>Compliance Score</h2>
+          <div class="score-num">75<span>%</span></div>
+          <div class="score-label">⚡ Action Required</div>
+        </div>
+        <div class="score-bar-wrap">
+          <div class="score-bar-bg"><div class="score-bar-fill"></div></div>
+        </div>
+        <div class="score-right">
+          <div class="score-date">Last checked: 27 May 2026</div>
+          <div class="score-next">6 of 8 documents compliant</div>
+        </div>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="stat-grid">
+        <div class="stat-card red" onclick="filterStatus('expired')" id="card-expired">
+          <div class="stat-num">1</div>
+          <div class="stat-label">Expired</div>
+        </div>
+        <div class="stat-card amber" onclick="filterStatus('due')" id="card-due">
+          <div class="stat-num">1</div>
+          <div class="stat-label">Due Soon</div>
+        </div>
+        <div class="stat-card green" onclick="filterStatus('compliant')" id="card-compliant">
+          <div class="stat-num">5</div>
+          <div class="stat-label">Compliant</div>
+        </div>
+        <div class="stat-card blue" onclick="filterStatus('onfile')" id="card-onfile">
+          <div class="stat-num">1</div>
+          <div class="stat-label">On File</div>
+        </div>
+      </div>
+
+      <!-- Documents -->
+      <div class="section-header">
+        <div class="section-title" id="sectionTitle">All Documents</div>
+        <div style="font-size:12px;color:#94a3b8" id="docCount">8 documents</div>
+      </div>
+
+      <div class="doc-grid" id="docGrid">
+
+        <!-- RTA - EXPIRED -->
+        <div class="doc-card" data-cat="rta" data-status="expired" onclick="openModal('rta')">
+          <div class="doc-card-top">
+            <div class="doc-icon red">🧯</div>
+            <span class="status-badge badge-red">EXPIRED</span>
+          </div>
+          <div class="doc-name">Refrigerant Trading Authorisation</div>
+          <div class="doc-meta">Australian Refrigeration Council · RTA-2019-NSW-48821</div>
+          <div class="doc-dates">
+            <div class="doc-date-item"><label>Issued</label><span>12 Mar 2021</span></div>
+            <div class="doc-date-item"><label>Expired</label><span>11 Mar 2026</span></div>
+          </div>
+          <div class="doc-expiry-warn">⚠ Expired 77 days ago — renewal required</div>
+        </div>
+
+        <!-- Public Liability - DUE SOON -->
+        <div class="doc-card" data-cat="insurance" data-status="due" onclick="openModal('liability')">
+          <div class="doc-card-top">
+            <div class="doc-icon amber">🛡️</div>
+            <span class="status-badge badge-amber">DUE SOON</span>
+          </div>
+          <div class="doc-name">Public Liability Insurance</div>
+          <div class="doc-meta">QBE Insurance Australia · POL-2024-PL-77341</div>
+          <div class="doc-dates">
+            <div class="doc-date-item"><label>Issued</label><span>1 Jun 2025</span></div>
+            <div class="doc-date-item"><label>Expires</label><span>31 May 2026</span></div>
+          </div>
+          <div class="doc-expiry-warn">⏰ Expires in 4 days</div>
+        </div>
+
+        <!-- REPS Accreditation - COMPLIANT -->
+        <div class="doc-card" data-cat="reps" data-status="compliant" onclick="openModal('reps')">
+          <div class="doc-card-top">
+            <div class="doc-icon green">✅</div>
+            <span class="status-badge badge-green">COMPLIANT</span>
+          </div>
+          <div class="doc-name">REPS Accreditation Certificate</div>
+          <div class="doc-meta">NSW Energy · ACP-REPS-2024-00412</div>
+          <div class="doc-dates">
+            <div class="doc-date-item"><label>Issued</label><span>15 Jan 2024</span></div>
+            <div class="doc-date-item"><label>Expires</label><span>14 Jan 2027</span></div>
+          </div>
+          <div class="doc-expiry-ok">✓ 597 days remaining</div>
+        </div>
+
+        <!-- Workers Comp - COMPLIANT -->
+        <div class="doc-card" data-cat="insurance" data-status="compliant" onclick="openModal('workerscomp')">
+          <div class="doc-card-top">
+            <div class="doc-icon green">👷</div>
+            <span class="status-badge badge-green">COMPLIANT</span>
+          </div>
+          <div class="doc-name">Workers Compensation Insurance</div>
+          <div class="doc-meta">icare NSW · WC-2025-NSW-992341</div>
+          <div class="doc-dates">
+            <div class="doc-date-item"><label>Issued</label><span>1 Jul 2025</span></div>
+            <div class="doc-date-item"><label>Expires</label><span>30 Jun 2026</span></div>
+          </div>
+          <div class="doc-expiry-ok">✓ 34 days remaining</div>
+        </div>
+
+        <!-- NSW Contractor Licence - COMPLIANT -->
+        <div class="doc-card" data-cat="licence" data-status="compliant" onclick="openModal('licence')">
+          <div class="doc-card-top">
+            <div class="doc-icon green">📋</div>
+            <span class="status-badge badge-green">COMPLIANT</span>
+          </div>
+          <div class="doc-name">NSW Contractor Licence — Refrigeration</div>
+          <div class="doc-meta">NSW Fair Trading · LIC-RF-NSW-208847</div>
+          <div class="doc-dates">
+            <div class="doc-date-item"><label>Issued</label><span>8 Aug 2022</span></div>
+            <div class="doc-date-item"><label>Expires</label><span>7 Aug 2027</span></div>
+          </div>
+          <div class="doc-expiry-ok">✓ 437 days remaining</div>
+        </div>
+
+        <!-- ABN Registration - ON FILE -->
+        <div class="doc-card" data-cat="licence" data-status="onfile" onclick="openModal('abn')">
+          <div class="doc-card-top">
+            <div class="doc-icon blue">🏢</div>
+            <span class="status-badge badge-blue">ON FILE</span>
+          </div>
+          <div class="doc-name">ABN / Business Registration</div>
+          <div class="doc-meta">ABR · ABN 54 112 334 771</div>
+          <div class="doc-dates">
+            <div class="doc-date-item"><label>Registered</label><span>3 Feb 2015</span></div>
+            <div class="doc-date-item"><label>Expires</label><span>No expiry</span></div>
+          </div>
+          <div class="doc-expiry-ok">✓ No renewal required</div>
+        </div>
+
+        <!-- Professional Indemnity - COMPLIANT -->
+        <div class="doc-card" data-cat="insurance" data-status="compliant" onclick="openModal('indemnity')">
+          <div class="doc-card-top">
+            <div class="doc-icon green">📑</div>
+            <span class="status-badge badge-green">COMPLIANT</span>
+          </div>
+          <div class="doc-name">Professional Indemnity Insurance</div>
+          <div class="doc-meta">Vero Insurance · PI-2025-VER-44129</div>
+          <div class="doc-dates">
+            <div class="doc-date-item"><label>Issued</label><span>1 Sep 2025</span></div>
+            <div class="doc-date-item"><label>Expires</label><span>31 Aug 2026</span></div>
+          </div>
+          <div class="doc-expiry-ok">✓ 96 days remaining</div>
+        </div>
+
+        <!-- IPART Registration - COMPLIANT -->
+        <div class="doc-card" data-cat="reps" data-status="compliant" onclick="openModal('ipart')">
+          <div class="doc-card-top">
+            <div class="doc-icon green">⚡</div>
+            <span class="status-badge badge-green">COMPLIANT</span>
+          </div>
+          <div class="doc-name">IPART Energy Savings Registration</div>
+          <div class="doc-meta">IPART NSW · ESS-ACP-2023-08812</div>
+          <div class="doc-dates">
+            <div class="doc-date-item"><label>Issued</label><span>22 Nov 2023</span></div>
+            <div class="doc-date-item"><label>Expires</label><span>21 Nov 2026</span></div>
+          </div>
+          <div class="doc-expiry-ok">✓ 178 days remaining</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay hidden" id="modalOverlay" onclick="closeModalIfOutside(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Document Details</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+const docs = {
+  rta: {
+    title: 'Refrigerant Trading Authorisation',
+    status: 'EXPIRED',
+    statusClass: 'badge-red',
+    fields: [
+      ['Authorisation Number','RTA-2019-NSW-48821'],
+      ['Issued By','Australian Refrigeration Council (ARC)'],
+      ['Holder','Coastal Climate Solutions Pty Ltd'],
+      ['ABN','54 112 334 771'],
+      ['Refrigerant Classes','HC, HFC, HCFC'],
+      ['Issue Date','12 March 2021'],
+      ['Expiry Date','11 March 2026'],
+      ['Status','EXPIRED — Renewal overdue'],
+    ],
+    note: '⚠ This authorisation has expired. You are not legally permitted to trade refrigerants until renewed. Contact ARC immediately.',
+    noteClass: 'doc-expiry-warn',
+    seal: 'ARC\nARCtick',
+    sealText: 'Australian Refrigeration Council — National Authorisation Scheme'
+  },
+  liability: {
+    title: 'Public Liability Insurance',
+    status: 'DUE SOON',
+    statusClass: 'badge-amber',
+    fields: [
+      ['Policy Number','POL-2024-PL-77341'],
+      ['Insurer','QBE Insurance Australia'],
+      ['Insured','Coastal Climate Solutions Pty Ltd'],
+      ['Coverage Amount','$20,000,000 AUD'],
+      ['Coverage Type','Public & Products Liability'],
+      ['Issue Date','1 June 2025'],
+      ['Expiry Date','31 May 2026'],
+      ['Status','Renewal due in 4 days'],
+    ],
+    note: '⏰ Contact your broker immediately to arrange renewal before 31 May 2026.',
+    noteClass: 'doc-expiry-warn',
+    seal: 'QBE',
+    sealText: 'QBE Insurance Group Limited — Authorised insurer under APRA'
+  },
+  reps: {
+    title: 'REPS Accreditation Certificate',
+    status: 'COMPLIANT',
+    statusClass: 'badge-green',
+    fields: [
+      ['Certificate Number','ACP-REPS-2024-00412'],
+      ['Issued By','NSW Department of Energy'],
+      ['Holder','Coastal Climate Solutions Pty Ltd'],
+      ['Scheme','Retailer Energy Productivity Scheme (REPS)'],
+      ['Activity Class','High-efficiency air conditioning installation'],
+      ['Issue Date','15 January 2024'],
+      ['Expiry Date','14 January 2027'],
+      ['Status','Active and compliant'],
+    ],
+    note: '✓ Accreditation is current. Next review due January 2027.',
+    noteClass: 'doc-expiry-ok',
+    seal: 'NSW\nEnergy',
+    sealText: 'NSW Government — Authorised under the Electricity Supply Act 1995'
+  },
+  workerscomp: {
+    title: "Workers Compensation Insurance",
+    status: 'COMPLIANT',
+    statusClass: 'badge-green',
+    fields: [
+      ['Policy Number','WC-2025-NSW-992341'],
+      ['Insurer','icare NSW'],
+      ['Insured','Coastal Climate Solutions Pty Ltd'],
+      ['Wages Declared','$620,000 AUD (2025–26)'],
+      ['Industry Code','2841 — Refrigeration & Air Conditioning'],
+      ['Issue Date','1 July 2025'],
+      ['Expiry Date','30 June 2026'],
+      ['Status','Current — renewal in 34 days'],
+    ],
+    note: '✓ Policy is current. Renewal reminder set for 1 June 2026.',
+    noteClass: 'doc-expiry-ok',
+    seal: 'icare',
+    sealText: 'icare NSW — State Insurance Regulatory Authority'
+  },
+  licence: {
+    title: 'NSW Contractor Licence — Refrigeration & AC',
+    status: 'COMPLIANT',
+    statusClass: 'badge-green',
+    fields: [
+      ['Licence Number','LIC-RF-NSW-208847'],
+      ['Issuing Authority','NSW Fair Trading'],
+      ['Holder','Shane Corrigan — Coastal Climate Solutions'],
+      ['Licence Class','Refrigeration & Air Conditioning (Unrestricted)'],
+      ['Endorsed For','Commercial & residential installation'],
+      ['Issue Date','8 August 2022'],
+      ['Expiry Date','7 August 2027'],
+      ['Status','Active'],
+    ],
+    note: '✓ Licence is active. No action required until August 2027.',
+    noteClass: 'doc-expiry-ok',
+    seal: 'NSW\nFair\nTrade',
+    sealText: 'NSW Fair Trading — Department of Customer Service'
+  },
+  abn: {
+    title: 'ABN / Business Registration',
+    status: 'ON FILE',
+    statusClass: 'badge-blue',
+    fields: [
+      ['ABN','54 112 334 771'],
+      ['Entity Name','Coastal Climate Solutions Pty Ltd'],
+      ['Entity Type','Australian Private Company'],
+      ['GST Registered','Yes — since 3 February 2015'],
+      ['Main Business Activity','Air conditioning installation & service'],
+      ['Registered State','NSW'],
+      ['Registration Date','3 February 2015'],
+      ['Status','Active — no expiry'],
+    ],
+    note: '✓ ABN is active with no renewal required.',
+    noteClass: 'doc-expiry-ok',
+    seal: 'ABR',
+    sealText: 'Australian Business Register — ATO administered'
+  },
+  indemnity: {
+    title: 'Professional Indemnity Insurance',
+    status: 'COMPLIANT',
+    statusClass: 'badge-green',
+    fields: [
+      ['Policy Number','PI-2025-VER-44129'],
+      ['Insurer','Vero Insurance'],
+      ['Insured','Coastal Climate Solutions Pty Ltd'],
+      ['Coverage Amount','$5,000,000 AUD per claim'],
+      ['Retroactive Date','1 September 2018'],
+      ['Issue Date','1 September 2025'],
+      ['Expiry Date','31 August 2026'],
+      ['Status','Current'],
+    ],
+    note: '✓ Policy is current. 96 days until renewal.',
+    noteClass: 'doc-expiry-ok',
+    seal: 'Vero',
+    sealText: 'Vero Insurance — Suncorp Group Limited'
+  },
+  ipart: {
+    title: 'IPART Energy Savings Registration',
+    status: 'COMPLIANT',
+    statusClass: 'badge-green',
+    fields: [
+      ['Registration Number','ESS-ACP-2023-08812'],
+      ['Issuing Authority','IPART NSW'],
+      ['Scheme','Energy Savings Scheme (ESS)'],
+      ['Holder','Coastal Climate Solutions Pty Ltd'],
+      ['Accredited Activities','HVAC replacement — residential & small commercial'],
+      ['Issue Date','22 November 2023'],
+      ['Expiry Date','21 November 2026'],
+      ['Status','Active and compliant'],
+    ],
+    note: '✓ Registration is active. 178 days remaining.',
+    noteClass: 'doc-expiry-ok',
+    seal: 'IPART',
+    sealText: 'Independent Pricing & Regulatory Tribunal — NSW Government'
+  }
+};
+
+function openModal(key) {
+  const d = docs[key];
+  if (!d) return;
+  document.getElementById('modalTitle').textContent = d.title;
+  const fieldsHtml = d.fields.map(f =>
+    `<div class="pdf-field"><span class="pdf-field-label">${f[0]}</span><span class="pdf-field-value">${f[1]}</span></div>`
+  ).join('');
+  document.getElementById('modalBody').innerHTML = `
+    <div class="pdf-viewer">
+      <div class="pdf-header">
+        <div class="pdf-header-title">${d.title}</div>
+        <div class="pdf-header-logo">OFFICIAL DOCUMENT</div>
+      </div>
+      <div class="pdf-body">
+        ${fieldsHtml}
+      </div>
+      <div class="pdf-seal">
+        <div class="seal-circle">${d.seal}</div>
+        <div class="seal-text">${d.sealText}</div>
+      </div>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <div class="detail-label">Status</div>
+        <div class="detail-value"><span class="status-badge ${d.statusClass}">${d.status}</span></div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">DocVault Record</div>
+        <div class="detail-value">Auto-categorised ✓</div>
+      </div>
+    </div>
+    <div class="${d.noteClass}" style="margin-bottom:16px;font-size:13px;">${d.note}</div>
+    <div class="modal-actions">
+      <button class="btn btn-primary">⬇ Download</button>
+      <button class="btn btn-secondary">✏ Edit Details</button>
+      <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+    </div>
+  `;
+  document.getElementById('modalOverlay').classList.remove('hidden');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.add('hidden');
+}
+
+function closeModalIfOutside(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+function filterStatus(status) {
+  const cards = document.querySelectorAll('.doc-card');
+  cards.forEach(c => {
+    c.classList.toggle('hidden', c.dataset.status !== status);
+  });
+  document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+  document.getElementById('card-' + status).classList.add('active');
+  const labels = {expired:'Expired Documents',due:'Due Soon',compliant:'Compliant',onfile:'On File'};
+  document.getElementById('sectionTitle').textContent = labels[status] || 'All Documents';
+  const visible = document.querySelectorAll('.doc-card:not(.hidden)').length;
+  document.getElementById('docCount').textContent = visible + ' document' + (visible !== 1 ? 's' : '');
+  document.getElementById('pageTitle').textContent = labels[status] || 'Compliance Overview';
+}
+
+function filterCat(cat) {
+  const cards = document.querySelectorAll('.doc-card');
+  cards.forEach(c => c.classList.toggle('hidden', c.dataset.cat !== cat));
+  document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+  const catLabels = {rta:'Refrigerant Auth (RTA)',reps:'REPS Accreditation',insurance:'Insurance',licence:'Licences & Registration',financial:'Financial & Tax',contracts:'Contracts & Agreements'};
+  document.getElementById('sectionTitle').textContent = catLabels[cat] || 'Documents';
+  const visible = document.querySelectorAll('.doc-card:not(.hidden)').length;
+  document.getElementById('docCount').textContent = visible + ' document' + (visible !== 1 ? 's' : '');
+  document.getElementById('pageTitle').textContent = catLabels[cat] || 'Documents';
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+}
+
+function showAll() {
+  document.querySelectorAll('.doc-card').forEach(c => c.classList.remove('hidden'));
+  document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach((n,i) => n.classList.toggle('active', i===0));
+  document.getElementById('sectionTitle').textContent = 'All Documents';
+  document.getElementById('docCount').textContent = '8 documents';
+  document.getElementById('pageTitle').textContent = 'Compliance Overview';
+}
+</script>
+</body>
+</html>
