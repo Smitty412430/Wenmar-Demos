@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DocVault ACP</title>
+<title>AMBER ACP</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f2f5;color:#1a1a2e;min-height:100vh}
@@ -154,8 +154,9 @@
   <!-- Sidebar -->
   <div class="sidebar">
     <div class="logo">
-      <div class="logo-mark">Doc<span>Vault</span></div>
-      <div class="logo-sub">ACP Edition</div>
+      <div class="logo-mark" style="font-size:22px;font-weight:800;letter-spacing:3px;color:#EF9F27">AMBER</div>
+      <div class="logo-sub" style="letter-spacing:2px">ACP EDITION</div>
+      <div style="display:flex;margin-top:6px"><div style="height:3px;width:18px;background:#E24B4A"></div><div style="height:3px;width:18px;background:#EF9F27"></div><div style="height:3px;width:18px;background:#639922"></div></div>
     </div>
     <div class="company-badge">
       <div class="company-name">Coastal Climate Solutions</div>
@@ -177,7 +178,7 @@
       <div class="nav-item" onclick="filterCat('contracts')"><div class="dot dot-green"></div>Contracts &amp; Agreements</div>
     </div>
     <div class="nav-footer">
-      <div class="version">DocVault ACP v1.0 · WenMar Digital</div>
+      <div class="version">AMBER ACP v1.0 · WenMar Digital</div>
     </div>
   </div>
 
@@ -390,14 +391,14 @@ const infoContent = {
   ai: {
     title: '🤖 AI Document Parsing',
     body: `
-      <p style="font-size:13px;color:#475569;margin-bottom:16px;line-height:1.7">DocVault uses AI to automatically read uploaded documents and extract key details — document type, issuer, issue date, and expiry date — so you don't have to type anything manually.</p>
+      <p style="font-size:13px;color:#475569;margin-bottom:16px;line-height:1.7">AMBER uses AI to automatically read uploaded documents and extract key details — document type, issuer, issue date, and expiry date — so you don't have to type anything manually.</p>
       <div class="info-section">
         <div class="info-section-title">Ollama — Local AI <span class="info-tag tag-free">FREE</span><span class="info-tag tag-local">100% LOCAL</span></div>
         <div class="info-section-body">Ollama runs an AI model directly on your own computer. Your documents never leave your machine — everything is processed locally with no internet connection required.<br><br><strong>Pros:</strong> Free, completely private, works offline, no ongoing costs.<br><strong>Cons:</strong> Requires a one-time setup, slightly slower, accuracy depends on your hardware. Best suited for businesses with a modern desktop or laptop.</div>
       </div>
       <div class="info-section">
         <div class="info-section-title">Claude API — Cloud AI <span class="info-tag tag-cloud">CLOUD</span><span class="info-tag tag-paid">SMALL COST</span></div>
-        <div class="info-section-body">Claude is Anthropic's AI, accessed via the internet. DocVault sends your document text to Claude for analysis and gets back structured data instantly.<br><br><strong>Pros:</strong> Faster, more accurate, no setup required, handles complex or unusual documents very well.<br><strong>Cons:</strong> Requires an internet connection and a small per-document API cost (typically less than half a cent — under $0.003 per document). Document text is sent to Anthropic's servers — Anthropic does not store or train on this data.</div>
+        <div class="info-section-body">Claude is Anthropic's AI, accessed via the internet. AMBER sends your document text to Claude for analysis and gets back structured data instantly.<br><br><strong>Pros:</strong> Faster, more accurate, no setup required, handles complex or unusual documents very well.<br><strong>Cons:</strong> Requires an internet connection and a small per-document API cost (typically less than half a cent — under $0.003 per document). Document text is sent to Anthropic's servers — Anthropic does not store or train on this data.</div>
       </div>
       <div class="info-section">
         <div class="info-section-title">Which should I choose?</div>
@@ -408,22 +409,22 @@ const infoContent = {
   backup: {
     title: '☁ Backup & Data Protection',
     body: `
-      <p style="font-size:13px;color:#475569;margin-bottom:16px;line-height:1.7">DocVault stores all your data locally on your own machine — it never automatically uploads anything to the internet. Backup is your choice, your control.</p>
+      <p style="font-size:13px;color:#475569;margin-bottom:16px;line-height:1.7">AMBER stores all your data locally on your own machine — it never automatically uploads anything to the internet. Backup is your choice, your control.</p>
       <div class="info-section">
         <div class="info-section-title">Local Folder Backup <span class="info-tag tag-free">FREE</span><span class="info-tag tag-local">ON-SITE</span></div>
-        <div class="info-section-body">DocVault can automatically back up your entire vault to any folder on your computer or a connected drive — USB, external hard drive, or a mapped network drive. Schedule it nightly or weekly, or trigger it manually with one click.<br><br>Best for: businesses with their own server or IT infrastructure.</div>
+        <div class="info-section-body">AMBER can automatically back up your entire vault to any folder on your computer or a connected drive — USB, external hard drive, or a mapped network drive. Schedule it nightly or weekly, or trigger it manually with one click.<br><br>Best for: businesses with their own server or IT infrastructure.</div>
       </div>
       <div class="info-section">
         <div class="info-section-title">Cloud Backup <span class="info-tag tag-cloud">CLOUD</span></div>
-        <div class="info-section-body">Back up your vault to a cloud storage service of your choice — Google Drive, Dropbox, OneDrive, or your own hosted server. DocVault exports an encrypted backup file which you can store anywhere.<br><br>The backup is AES-256 encrypted, meaning even if someone accessed the file they could not read your documents without your password.<br><br>Best for: businesses without on-site servers, or as a second layer of protection alongside local backup.</div>
+        <div class="info-section-body">Back up your vault to a cloud storage service of your choice — Google Drive, Dropbox, OneDrive, or your own hosted server. AMBER exports an encrypted backup file which you can store anywhere.<br><br>The backup is AES-256 encrypted, meaning even if someone accessed the file they could not read your documents without your password.<br><br>Best for: businesses without on-site servers, or as a second layer of protection alongside local backup.</div>
       </div>
       <div class="info-section">
         <div class="info-section-title">Manual Backup Now</div>
-        <div class="info-section-body">At any time you can trigger an immediate backup from the Settings panel. DocVault will create a timestamped encrypted ZIP of your entire vault — all documents, all records, all settings — ready to store wherever you choose.</div>
+        <div class="info-section-body">At any time you can trigger an immediate backup from the Settings panel. AMBER will create a timestamped encrypted ZIP of your entire vault — all documents, all records, all settings — ready to store wherever you choose.</div>
       </div>
       <div class="info-section">
         <div class="info-section-title">Restore</div>
-        <div class="info-section-body">If you ever need to move to a new computer or recover from a hardware failure, simply install DocVault, point it at your backup file, enter your password, and everything is restored exactly as it was.</div>
+        <div class="info-section-body">If you ever need to move to a new computer or recover from a hardware failure, simply install AMBER, point it at your backup file, enter your password, and everything is restored exactly as it was.</div>
       </div>
     `
   }
@@ -626,7 +627,7 @@ function openModal(key) {
         <div class="detail-value"><span class="status-badge ${d.statusClass}">${d.status}</span></div>
       </div>
       <div class="detail-item">
-        <div class="detail-label">DocVault Record</div>
+        <div class="detail-label">AMBER Record</div>
         <div class="detail-value">Auto-categorised ✓</div>
       </div>
     </div>
